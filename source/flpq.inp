@@ -1,0 +1,10 @@
+Num_DM_orb 1
+Num_DM_spin 0
+dens_origin 0.0 1.0e+9 1.0e+9
+Dens_Ngrid  1 200 200 
+#Grid_vectors.Unit   AU
+#<Grid_vectors
+#1.0   0.0   0.0
+#0.0   1.0   0.0
+#0.0   0.0   1.0
+#Grid_vectors>

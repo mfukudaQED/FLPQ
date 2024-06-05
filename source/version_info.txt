@@ -1,0 +1,29 @@
+# 20190519
+* Availability for any number of MPI processes
+
+# 20190520
+* bug fix: add coef -0.5 to stress_diag
+
+# 20190521
+* separate read_input_DM from read_input_openmx
+
+# 20190529
+* Bug in periodicity is found. Not fixed yet. -> This was just an input error.
+
+# 20190618
+* make Print_Cube
+
+# 20190629
+* tv_ori is added in Set_Grid.c.
+
+# 20191206
+* Set_Density_Grid_i.c, Set_dDensity_Grid_i.c, Set_ddDensity_Grid_i.c, Set_dd2Density_Grid_i.c
+  are modified for Collinear NEGF.
+
+# 20191215
+* Add kinetic_momentum_spinup and kinetic_momentum_spindown.
+
+# 20240115
+* All the memory leaks are checked.
+* Parallelization for the xmesh is implemented to reduce large memory consumption.
+
