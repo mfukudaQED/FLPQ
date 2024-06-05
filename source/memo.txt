@@ -1,0 +1,36 @@
+=====================
+Reset in Allocate atom2CPU
+or Set_Inf_SndRcv in truncation.c
+or Construct_MPI_Data_Structure_Grid in truncation.c.
+
+Max_FSNAN 
+Max_NumOLG
+Matomnum  
+MatomnumF 
+M2G
+F_M2G
+F_G2M
+G2ID 
+F_Snd_Num
+S_Snd_Num
+F_Rcv_Num
+S_Rcv_Num
+F_TopMAN 
+Snd_MAN 
+Snd_GAN
+Rcv_GAN
+Num_Snd_Grid_A2B
+Num_Rcv_Grid_A2B
+Index_Snd_Grid_A2B
+Index_Rcv_Grid_A2B
+
+=======================
+set in Set_Grid.c
+
+NN_A2B_S
+NN_A2B_R
+
+=======================
+derivative in k space
+FT_PAO.c
+RF_BesselF.c
