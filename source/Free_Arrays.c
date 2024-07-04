@@ -518,22 +518,22 @@ void Free_Arrays()
 
    /*  NumOLG is setted in Set_Grid.c */
   {
-    int Mc_AN,Gc_AN;
-    NumOLG = (int**)malloc(sizeof(int*)*(Matomnum+1));
+    int Mc_AN;
     for (Mc_AN=0; Mc_AN<=Matomnum; Mc_AN++){
-      if (Mc_AN==0) Gc_AN = 0;
-      else          Gc_AN = M2G[Mc_AN];
-      NumOLG[Mc_AN] = (int*)malloc(sizeof(int)*(FNAN[Gc_AN]+1));
+      free(NumOLG[Mc_AN]);
     }
+    free(NumOLG);
   }
 
 
-  CntCoes = (double***)malloc(sizeof(double**)*(Matomnum+MatomnumF+1));
-  for (i=0; i<=(Matomnum+MatomnumF); i++){
-    CntCoes[i] = (double**)malloc(sizeof(double*)*List_YOUSO[7]);
-    for (j=0; j<List_YOUSO[7]; j++){
-      CntCoes[i][j] = (double*)malloc(sizeof(double)*List_YOUSO[24]);
+  if (Cnt_switch==1){
+    for (i=0; i<=(Matomnum+MatomnumF); i++){
+      for (j=0; j<List_YOUSO[7]; j++){
+        free(CntCoes[i][j]);
+      }
+      free(CntCoes[i]);
     }
+    free(CntCoes);
   }
 
   free(FNAN);

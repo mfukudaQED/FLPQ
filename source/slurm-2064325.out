@@ -1,0 +1,5 @@
+List of compilers and libraries:
+/opt/intel/oneapi/mkl/2023.0.0
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiicc
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiifort
+icc: warning #10237: -lcilkrts linked in dynamically, static library not available

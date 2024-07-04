@@ -13,6 +13,15 @@ module purge
 #module load oneapi_compiler/2023.0.0 oneapi_mkl/2023.0.0 openmpi/4.1.5-oneapi-2023.0.0-classic
 module load oneapi_compiler/2023.0.0 oneapi_mkl/2023.0.0 oneapi_mpi/2023.0.0
 
-make -j 32
-make -j 32
-make
+echo "List of compilers and libraries:"
+echo $MKLROOT
+which mpiicc
+which mpiifort
+
+date > make.log
+make leakdetect.o LEAK_DETECT=1 >> make.log
+make -j 32 LEAK_DETECT=1 >> make.log
+make -j 32 LEAK_DETECT=1 >> make.log
+make LEAK_DETECT=1 >> make.log
+#make all >> make.log
+#make install

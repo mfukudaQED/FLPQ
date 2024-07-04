@@ -9,9 +9,10 @@
 ### ohtaka, Intel compiler + Intel MKL + Intel MPI
 ### used module ###
 #module load oneapi_compiler/2023.0.0 oneapi_mkl/2023.0.0 oneapi_mpi/2023.0.0
-CC = mpiicc -O3 -march=core-avx2 -ip -no-prec-div -qopenmp -I${MKLROOT}/include/fftw -parallel -par-schedule-auto -static-intel -qopenmp-link=static -qopt-malloc-options=3 -qopt-report
-FC = mpiifort -O3 -march=core-avx2 -ip -no-prec-div -qopenmp -parallel -par-schedule-auto -static-intel -qopenmp-link=static -qopt-malloc-options=3 -qopt-report
+CC = mpiicc -O3 -march=core-avx2 -ip -no-prec-div -qopenmp -I${MKLROOT}/include/fftw -parallel -par-schedule-auto -static-intel -qopenmp-link=static -qopt-malloc-options=3
+FC = mpiifort -O3 -march=core-avx2 -ip -no-prec-div -qopenmp -parallel -par-schedule-auto -static-intel -qopenmp-link=static -qopt-malloc-options=3
 LIB= -L${MKLROOT}/lib/intel64 -qmkl=parallel -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -lifcore -lpthread -lm -ldl
+CXX = mpiicpc -O3 -march=core-avx2 -ip -no-prec-div -qopenmp -std=c++11  -I${MKLROOT}/include/fftw
 
 #CC = mpicc -O3 -xHOST -qopenmp -ip -no-prec-div -mkl=parallel -I$(MKLROOT)/include/fftw -shared-intel -pg
 #FC = mpif90 -O3 -xHOST -qopenmp -ip -no-prec-div -mkl=parallel -I$(MKLROOT)/include/fftw -shared-intel -pg
@@ -75,10 +76,27 @@ OBJS    = main_flpq.o \
 PROG    = flpq
 DESTDIR = ../work
 
-# flpq
+#
+# memory leak detecter
+# enable the following comment out lines
+# add the option, -DLEAK_DETECT, to CC.
+# add the option, -std=c++0x, to CXX in some environment.
+#
+ifdef LEAK_DETECT
+CC      += -DLEAK_DETECT
+OBJS    += leakdetect.o
+endif
+
+
+### flpq ###
 
 flpq:	$(OBJS)
 	$(CC) $(OBJS) $(STACK) $(LIB) -lm -o flpq
+
+ifdef LEAK_DETECT
+leakdetect.o: leakdetect.cpp leakdetect.h
+	$(CXX) -c leakdetect.cpp
+endif
 
 main_flpq.o: main_flpq.c flpq.h
 	$(CC) -c main_flpq.c
@@ -139,4 +157,4 @@ Free_Arrays_in_Set_Grid.o: Free_Arrays_in_Set_Grid.c flpq.h
 #	$(CC) -c .c
 
 clean:
-	rm -f $(PROG) $(OBJS) *.optrpt
+	rm -f $(PROG) $(OBJS) *.optrpt *.o *.mod *dbg
