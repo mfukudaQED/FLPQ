@@ -27,3 +27,6 @@
 * All the memory leaks are checked.
 * Parallelization for the xmesh is implemented to reduce large memory consumption.
 
+# 20240704
+* Added leakdetect.cpp to detect memory leak problems
+* Added some free arrays
