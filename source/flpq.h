@@ -44,6 +44,10 @@ typedef struct MPIRequest{int i;} MPI_Request;
 #include "mpi.h"
 #endif
 
+#ifdef LEAK_DETECT
+#include "leakdetect.h"
+#endif
+
 MPI_Comm  mpi_comm_level1;
 MPI_Comm  MPI_COMM_WORLD1;
 int Num_Procs;

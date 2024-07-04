@@ -349,6 +349,21 @@ void Free_Arrays_in_Set_Grid()
   free(GListTAtoms1);
 
 
+  for (Mc_AN=0; Mc_AN<=Matomnum; Mc_AN++){
+    free(MGridListAtom[Mc_AN]);
+  }
+  free(MGridListAtom);
+
+  for (Mc_AN=0; Mc_AN<=Matomnum; Mc_AN++){
+    free(GridListAtom[Mc_AN]);
+  }
+  free(GridListAtom);
+
+  for (Mc_AN=0; Mc_AN<=Matomnum; Mc_AN++){
+    free(CellListAtom[Mc_AN]);
+  }
+  free(CellListAtom);
+
   for (ID=0; ID<numprocs; ID++){
     free(Index_Snd_Grid_A2B[ID]);
   }  

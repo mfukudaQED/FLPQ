@@ -49,6 +49,10 @@ int main(int argc, char *argv[])
   //} 
 
 
+#ifdef LEAK_DETECT
+  leak_detect_init();
+#endif
+
   if (myid==Host_ID){  
     printf("*******************************************************\n"); 
     printf("         Program code for LPQ calculations             \n");
@@ -276,6 +280,12 @@ int main(int argc, char *argv[])
     printf("end Free_Arrays\n");fflush(stdout);
     printf("\n");fflush(stdout);
   }
+#endif
+
+#ifdef LEAK_DETECT
+  MPI_Barrier(MPI_COMM_WORLD);
+  fflush(stdout);
+  leak_detect_check();
 #endif
 
   MPI_Barrier(MPI_COMM_WORLD);
