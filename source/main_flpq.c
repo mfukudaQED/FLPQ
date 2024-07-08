@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
       printf("out_LPQ step %d / %d,    ", N_loop_Ngrid1+1, loop_Ngrid1);
       printf("Grid_Origin: %f\n", Grid_Origin[1]); fflush(stdout);
     }
-    out_LPQ();
+    out_LPQ2();
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -286,6 +286,10 @@ int main(int argc, char *argv[])
   MPI_Barrier(MPI_COMM_WORLD);
   fflush(stdout);
   leak_detect_check();
+#endif
+
+#ifdef LEAK_DETECT
+  leak_detect_finalize();
 #endif
 
   MPI_Barrier(MPI_COMM_WORLD);
