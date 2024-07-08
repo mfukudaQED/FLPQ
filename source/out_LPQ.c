@@ -21,6 +21,13 @@
 #include "Local_physical_quantities.h"
 #include <sys/stat.h>
 
+typedef struct {
+  char LPQNAME[50];
+  int dimension;
+  int index;
+  int SpinP_switch;
+} Struct_LPQ;
+
 static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
 static void Print_LPQ_3D(FILE *fp, char fext[], int norder, int numLPQ);
 static void Print_CubeTitle(FILE *fp);
@@ -58,7 +65,7 @@ void out_LPQ()
 //     //calc_LPQ(".energy_density",         0, 4, myid);
      calc_LPQ(".charge_density_alpha",       0, 5, myid);   /* added by yoshida 23.December.2019 */
      calc_LPQ(".charge_density_beta",        0, 6, myid);   /* added by yoshida 23.December.2019 */
-     calc_LPQ(".energy",                     0, 7, myid);   /* added by takamatsu 19.February.2020 */
+     calc_LPQ(".energy_density_tau",         0, 7, myid);   /* added by takamatsu 19.February.2020 */
      calc_LPQ(".chemical_potential",         0, 8, myid);   /* added by takamatsu 19.February.2020 */     
      calc_LPQ(".charge_current",             1, 0, myid);
      calc_LPQ(".kinetic_momentum",           1, 1, myid);
@@ -96,7 +103,81 @@ void out_LPQ()
      calc_LPQ(".stress_nonrel_beta",         2, 7, myid);   /* added by yoshida 7.January.2020 */
 }
 
+/* modified by fukuda 08.July.2024 */
+void out_LPQ2()
+{
+  int ct_AN,spe,i1,i2,i3,GN,i,j,k;
+  char fileLPQ[YOUSO10];
+  int numprocs,myid,ID;
+  char operate[100];
+  int dircheck;
 
+  /* MPI */
+  MPI_Comm_size(mpi_comm_level1,&numprocs);
+  MPI_Comm_rank(mpi_comm_level1,&myid);
+
+  if ((myid==Host_ID)&&(N_loop_Ngrid1==0)){
+    //sprintf(operate,"mkdir %s",DirnameLPQ);
+    mkdir(DirnameLPQ,0755);
+  }
+  MPI_Barrier(mpi_comm_level1);
+
+  /****************************************************
+               Local physical quantities 
+  ****************************************************/
+  Struct_LPQ dataLPQ[] = {
+    {".electron_density",           0, 0, 0},
+    //{".charge_density",             0, 1, 0},
+    {".zeta_potential",             0, 2, 3},
+    {".kinetic_energy_density",     0, 3, 0},
+    //{".charge_density_alpha",       0, 5, 0},
+    //{".charge_density_beta",        0, 6, 0},
+    {".energy_density_tau",         0, 7, 0},
+    {".chemical_potential",         0, 8, 0},
+
+    {".charge_current",             1, 0, 0},
+    {".kinetic_momentum",           1, 1, 0},
+    {".spin_vorticity",             1, 2, 0},
+    {".spin_angular_momentum",      1, 3, 0},
+    {".zeta_force",                 1, 5, 3},
+    //{".pau_dd",                     1, 6, 3},
+    //{".gradient_electron_density",  1, 9, 0},
+
+    //{".spin_z_current",             1, 10, 3},
+    //{".charge_current_alpha",       1, 11, 3},
+    //{".charge_current_beta",        1, 12, 3},
+    //{".velocity",                   1, 13, 3},
+    //{".torq_zeta",                  1, 14, 3},
+    //{".soc_part1",                  1, 15, 3},
+    //{".kinetic_momentum_alpha",     1, 16, 3},
+    //{".kinetic_momentum_beta",      1, 17, 3},
+    //{".soc_part2",                  1, 18, 3},
+
+    //{".stress",                     2, 0, 0},
+    //{".stress_S",                   2, 1, 0},
+    //{".stress_A",                   2, 2, 3},
+    {".stress_diag",                2, 3, 0},
+    //{".dd_electron_density",        2, 4, 0},
+    //{".stress_nonrel",              2, 5, 0},
+    //{".stress_nonrel_alpha",        2, 6, 0},
+    //{".stress_nonrel_beta",         2, 7, 0}
+  };
+
+  int size_dataLPQ = sizeof(dataLPQ) / sizeof(dataLPQ[0]);
+
+  for (int i = 0; i < size_dataLPQ; i++) {
+    if(SpinP_switch<3){
+      if(dataLPQ[i].SpinP_switch==0){
+        calc_LPQ(dataLPQ[i].LPQNAME,  dataLPQ[i].dimension, dataLPQ[i].index, myid);
+      }
+    }
+    else{
+      if(dataLPQ[i].SpinP_switch==3){
+        calc_LPQ(dataLPQ[i].LPQNAME,  dataLPQ[i].dimension, dataLPQ[i].index, myid);
+      }
+    }
+  }
+}
 
 void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid)
 {

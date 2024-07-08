@@ -73,7 +73,7 @@ void leak_detect_check(void){
   }
   omp_unset_lock(&lock);
 
-  omp_destroy_lock(&lock);
+  //omp_destroy_lock(&lock);
 }
 
 /* finalize */

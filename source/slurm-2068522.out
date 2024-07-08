@@ -1,0 +1,580 @@
+List of compilers and libraries:
+/opt/intel/oneapi/mkl/2023.0.0
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiicc
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiifort
+out_LPQ.c(24): error: identifier "Struct_LPQ" is undefined
+  static void set_LPQ(Struct_LPQ dataLPQ, int size_dataLPQ);
+                      ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+            ^
+
+out_LPQ.c(109): error: expression must have pointer-to-object type
+    dataLPQ[] = {
+    ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+                ^
+
+out_LPQ.c(140): warning #12: parsing restarts here after previous syntax error
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a ";"
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a declaration
+      {".stress_diag",                2, 3, 0},
+                                              ^
+
+out_LPQ.c(145): warning #12: parsing restarts here after previous syntax error
+    };
+     ^
+
+out_LPQ.c(147): warning #77: this declaration has no storage class or type specifier
+    dataSize = sizeof(data) / sizeof(data[0]);
+    ^
+
+out_LPQ.c(147): error: identifier "data" is undefined
+    dataSize = sizeof(data) / sizeof(data[0]);
+                      ^
+
+out_LPQ.c(149): error: expected a declaration
+    return 0;
+    ^
+
+out_LPQ.c(151): error: expected a declaration
+  }
+  ^
+
+out_LPQ.c(177): warning #12: parsing restarts here after previous syntax error
+    set_LPQ(dataLPQ, size_dataLPQ);
+                                  ^
+
+out_LPQ.c(179): error: expected a declaration
+    for (int i = 0; i < size_dataLPQ; i++) {
+    ^
+
+out_LPQ.c(283): warning #12: parsing restarts here after previous syntax error
+    sprintf(fname,"Density_Grid_%i.bin",myid);
+                                             ^
+
+out_LPQ.c(284): warning #77: this declaration has no storage class or type specifier
+    fp = fopen(fname,"wb");
+    ^
+
+out_LPQ.c(284): error: function call is not allowed in a constant expression
+    fp = fopen(fname,"wb");
+         ^
+
+out_LPQ.c(284): error: identifier "fname" is undefined
+    fp = fopen(fname,"wb");
+               ^
+
+out_LPQ.c(286): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(344): warning #12: parsing restarts here after previous syntax error
+    fclose(fp);
+              ^
+
+out_LPQ.c(350): warning #77: this declaration has no storage class or type specifier
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(350): warning #92: identifier-list parameters may only be used in a function definition
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(352): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(408): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(409): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(409): error: identifier "myid" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+            ^
+
+out_LPQ.c(409): error: identifier "N2D" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                 ^
+
+out_LPQ.c(409): error: identifier "numprocs" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                     ^
+
+out_LPQ.c(409): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(411): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB++){
+    ^
+
+out_LPQ.c(432): warning #12: parsing restarts here after previous syntax error
+      else if (norder==2) tensor_density(numLPQ, fp, BN_AB);
+                                                           ^
+
+out_LPQ.c(434): error: expected a declaration
+      if (Ngrid3==1) {
+      ^
+
+out_LPQ.c(498): warning #12: parsing restarts here after previous syntax error
+          Ngrid2,tv[2][1]/(double)Ngrid2,tv[2][2]/(double)Ngrid2,tv[2][3]/(double)Ngrid2);
+                                                                                         ^
+
+out_LPQ.c(499): error: expected an identifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+                 ^
+
+out_LPQ.c(500): error: expected a ")"
+          Ngrid3,tv[3][1]/(double)Ngrid3,tv[3][2]/(double)Ngrid3,tv[3][3]/(double)Ngrid3);
+                   ^
+
+out_LPQ.c(499): warning #77: this declaration has no storage class or type specifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #92: identifier-list parameters may only be used in a function definition
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #147: declaration is incompatible with "int fprintf(FILE *__restrict__, const char *__restrict__, ...)" (declared at line 326 of "/usr/include/stdio.h")
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(501): error: expected a declaration
+    }
+    ^
+
+out_LPQ.c(538): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(539): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: variable "GNs" has already been initialized
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(543): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB+=Ngrid3){
+    ^
+
+out_LPQ.c(624): warning #12: parsing restarts here after previous syntax error
+    sprintf(operate1,"%s/LPQ%s",DirnameLPQ,fext);
+                                                ^
+
+out_LPQ.c(634): error: expected a declaration
+    for (ID=0; ID<numprocs; ID++){
+    ^
+
+out_LPQ.c(661): warning #12: parsing restarts here after previous syntax error
+
+out_LPQ.c(25): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2
+out_LPQ.c(24): error: identifier "Struct_LPQ" is undefined
+  static void set_LPQ(Struct_LPQ dataLPQ, int size_dataLPQ);
+                      ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+            ^
+
+out_LPQ.c(109): error: expression must have pointer-to-object type
+    dataLPQ[] = {
+    ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+                ^
+
+out_LPQ.c(140): warning #12: parsing restarts here after previous syntax error
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a ";"
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a declaration
+      {".stress_diag",                2, 3, 0},
+                                              ^
+
+out_LPQ.c(145): warning #12: parsing restarts here after previous syntax error
+    };
+     ^
+
+out_LPQ.c(147): warning #77: this declaration has no storage class or type specifier
+    dataSize = sizeof(data) / sizeof(data[0]);
+    ^
+
+out_LPQ.c(147): error: identifier "data" is undefined
+    dataSize = sizeof(data) / sizeof(data[0]);
+                      ^
+
+out_LPQ.c(149): error: expected a declaration
+    return 0;
+    ^
+
+out_LPQ.c(151): error: expected a declaration
+  }
+  ^
+
+out_LPQ.c(177): warning #12: parsing restarts here after previous syntax error
+    set_LPQ(dataLPQ, size_dataLPQ);
+                                  ^
+
+out_LPQ.c(179): error: expected a declaration
+    for (int i = 0; i < size_dataLPQ; i++) {
+    ^
+
+out_LPQ.c(283): warning #12: parsing restarts here after previous syntax error
+    sprintf(fname,"Density_Grid_%i.bin",myid);
+                                             ^
+
+out_LPQ.c(284): warning #77: this declaration has no storage class or type specifier
+    fp = fopen(fname,"wb");
+    ^
+
+out_LPQ.c(284): error: function call is not allowed in a constant expression
+    fp = fopen(fname,"wb");
+         ^
+
+out_LPQ.c(284): error: identifier "fname" is undefined
+    fp = fopen(fname,"wb");
+               ^
+
+out_LPQ.c(286): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(344): warning #12: parsing restarts here after previous syntax error
+    fclose(fp);
+              ^
+
+out_LPQ.c(350): warning #77: this declaration has no storage class or type specifier
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(350): warning #92: identifier-list parameters may only be used in a function definition
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(352): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(408): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(409): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(409): error: identifier "myid" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+            ^
+
+out_LPQ.c(409): error: identifier "N2D" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                 ^
+
+out_LPQ.c(409): error: identifier "numprocs" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                     ^
+
+out_LPQ.c(409): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(411): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB++){
+    ^
+
+out_LPQ.c(432): warning #12: parsing restarts here after previous syntax error
+      else if (norder==2) tensor_density(numLPQ, fp, BN_AB);
+                                                           ^
+
+out_LPQ.c(434): error: expected a declaration
+      if (Ngrid3==1) {
+      ^
+
+out_LPQ.c(498): warning #12: parsing restarts here after previous syntax error
+          Ngrid2,tv[2][1]/(double)Ngrid2,tv[2][2]/(double)Ngrid2,tv[2][3]/(double)Ngrid2);
+                                                                                         ^
+
+out_LPQ.c(499): error: expected an identifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+                 ^
+
+out_LPQ.c(500): error: expected a ")"
+          Ngrid3,tv[3][1]/(double)Ngrid3,tv[3][2]/(double)Ngrid3,tv[3][3]/(double)Ngrid3);
+                   ^
+
+out_LPQ.c(499): warning #77: this declaration has no storage class or type specifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #92: identifier-list parameters may only be used in a function definition
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #147: declaration is incompatible with "int fprintf(FILE *__restrict__, const char *__restrict__, ...)" (declared at line 326 of "/usr/include/stdio.h")
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(501): error: expected a declaration
+    }
+    ^
+
+out_LPQ.c(538): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(539): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: variable "GNs" has already been initialized
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(543): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB+=Ngrid3){
+    ^
+
+out_LPQ.c(624): warning #12: parsing restarts here after previous syntax error
+    sprintf(operate1,"%s/LPQ%s",DirnameLPQ,fext);
+                                                ^
+
+out_LPQ.c(634): error: expected a declaration
+    for (ID=0; ID<numprocs; ID++){
+    ^
+
+out_LPQ.c(661): warning #12: parsing restarts here after previous syntax error
+
+out_LPQ.c(25): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2
+out_LPQ.c(24): error: identifier "Struct_LPQ" is undefined
+  static void set_LPQ(Struct_LPQ dataLPQ, int size_dataLPQ);
+                      ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+            ^
+
+out_LPQ.c(109): error: expression must have pointer-to-object type
+    dataLPQ[] = {
+    ^
+
+out_LPQ.c(109): error: expected an expression
+    dataLPQ[] = {
+                ^
+
+out_LPQ.c(140): warning #12: parsing restarts here after previous syntax error
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a ";"
+      {".stress_diag",                2, 3, 0},
+                                             ^
+
+out_LPQ.c(140): error: expected a declaration
+      {".stress_diag",                2, 3, 0},
+                                              ^
+
+out_LPQ.c(145): warning #12: parsing restarts here after previous syntax error
+    };
+     ^
+
+out_LPQ.c(147): warning #77: this declaration has no storage class or type specifier
+    dataSize = sizeof(data) / sizeof(data[0]);
+    ^
+
+out_LPQ.c(147): error: identifier "data" is undefined
+    dataSize = sizeof(data) / sizeof(data[0]);
+                      ^
+
+out_LPQ.c(149): error: expected a declaration
+    return 0;
+    ^
+
+out_LPQ.c(151): error: expected a declaration
+  }
+  ^
+
+out_LPQ.c(177): warning #12: parsing restarts here after previous syntax error
+    set_LPQ(dataLPQ, size_dataLPQ);
+                                  ^
+
+out_LPQ.c(179): error: expected a declaration
+    for (int i = 0; i < size_dataLPQ; i++) {
+    ^
+
+out_LPQ.c(283): warning #12: parsing restarts here after previous syntax error
+    sprintf(fname,"Density_Grid_%i.bin",myid);
+                                             ^
+
+out_LPQ.c(284): warning #77: this declaration has no storage class or type specifier
+    fp = fopen(fname,"wb");
+    ^
+
+out_LPQ.c(284): error: function call is not allowed in a constant expression
+    fp = fopen(fname,"wb");
+         ^
+
+out_LPQ.c(284): error: identifier "fname" is undefined
+    fp = fopen(fname,"wb");
+               ^
+
+out_LPQ.c(286): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(344): warning #12: parsing restarts here after previous syntax error
+    fclose(fp);
+              ^
+
+out_LPQ.c(350): warning #77: this declaration has no storage class or type specifier
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(350): warning #92: identifier-list parameters may only be used in a function definition
+    MPI_Barrier(mpi_comm_level1);
+    ^
+
+out_LPQ.c(352): error: expected a declaration
+    if (myid==Host_ID){
+    ^
+
+out_LPQ.c(408): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(409): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(409): error: identifier "myid" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+            ^
+
+out_LPQ.c(409): error: identifier "N2D" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                 ^
+
+out_LPQ.c(409): error: identifier "numprocs" is undefined
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                     ^
+
+out_LPQ.c(409): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(411): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB++){
+    ^
+
+out_LPQ.c(432): warning #12: parsing restarts here after previous syntax error
+      else if (norder==2) tensor_density(numLPQ, fp, BN_AB);
+                                                           ^
+
+out_LPQ.c(434): error: expected a declaration
+      if (Ngrid3==1) {
+      ^
+
+out_LPQ.c(498): warning #12: parsing restarts here after previous syntax error
+          Ngrid2,tv[2][1]/(double)Ngrid2,tv[2][2]/(double)Ngrid2,tv[2][3]/(double)Ngrid2);
+                                                                                         ^
+
+out_LPQ.c(499): error: expected an identifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+                 ^
+
+out_LPQ.c(500): error: expected a ")"
+          Ngrid3,tv[3][1]/(double)Ngrid3,tv[3][2]/(double)Ngrid3,tv[3][3]/(double)Ngrid3);
+                   ^
+
+out_LPQ.c(499): warning #77: this declaration has no storage class or type specifier
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #92: identifier-list parameters may only be used in a function definition
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(499): warning #147: declaration is incompatible with "int fprintf(FILE *__restrict__, const char *__restrict__, ...)" (declared at line 326 of "/usr/include/stdio.h")
+      fprintf(fp,"%5d%12.6lf%12.6lf%12.6lf\n",
+      ^
+
+out_LPQ.c(501): error: expected a declaration
+    }
+    ^
+
+out_LPQ.c(538): warning #12: parsing restarts here after previous syntax error
+    N2D = Ngrid1*Ngrid2;
+                       ^
+
+out_LPQ.c(539): warning #77: this declaration has no storage class or type specifier
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: variable "GNs" has already been initialized
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+    ^
+
+out_LPQ.c(539): error: expression must have a constant value
+    GNs = ((myid*N2D+numprocs-1)/numprocs)*Ngrid3;
+                                           ^
+
+out_LPQ.c(543): error: expected a declaration
+    for (BN_AB=0; BN_AB<My_NumGridB_AB; BN_AB+=Ngrid3){
+    ^
+
+out_LPQ.c(624): warning #12: parsing restarts here after previous syntax error
+    sprintf(operate1,"%s/LPQ%s",DirnameLPQ,fext);
+                                                ^
+
+out_LPQ.c(634): error: expected a declaration
+    for (ID=0; ID<numprocs; ID++){
+    ^
+
+out_LPQ.c(661): warning #12: parsing restarts here after previous syntax error
+
+out_LPQ.c(25): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2

@@ -1,0 +1,40 @@
+List of compilers and libraries:
+/opt/intel/oneapi/mkl/2023.0.0
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiicc
+/opt/intel/oneapi/mpi/2021.8.0/bin/mpiifort
+out_LPQ.c(168): error: identifier "size_dataLPQ" is undefined
+    for (int i = 0; i < size_dataLPQ; i++) {
+                        ^
+
+out_LPQ.c(650): error: expected a "}"
+
+out_LPQ.c(31): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2
+out_LPQ.c(168): error: identifier "size_dataLPQ" is undefined
+    for (int i = 0; i < size_dataLPQ; i++) {
+                        ^
+
+out_LPQ.c(650): error: expected a "}"
+
+out_LPQ.c(31): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2
+out_LPQ.c(168): error: identifier "size_dataLPQ" is undefined
+    for (int i = 0; i < size_dataLPQ; i++) {
+                        ^
+
+out_LPQ.c(650): error: expected a "}"
+
+out_LPQ.c(31): warning #2637: static function "calc_LPQ" treated as extern because it was referenced but not defined
+  static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+              ^
+
+compilation aborted for out_LPQ.c (code 2)
+make: *** [makefile:140: out_LPQ.o] Error 2

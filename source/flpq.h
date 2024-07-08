@@ -960,6 +960,7 @@ double Set_dDensity_Grid_i(double *****CDM);
 double Set_ddDensity_Grid_i(double *****CDM);
 double Set_dd2Density_Grid_i(double *****CDM);
 void out_LPQ();
+void out_LPQ2();
 void Set_Grid_Origin_N();
 void Free_Arrays();
 void Free_Arrays_in_Set_Grid();
