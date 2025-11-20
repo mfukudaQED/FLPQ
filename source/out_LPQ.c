@@ -172,9 +172,9 @@ void out_LPQ2()
       }
     }
     else{
-      if(dataLPQ[i].SpinP_switch==3){
+      //if(dataLPQ[i].SpinP_switch==3){
         calc_LPQ(dataLPQ[i].LPQNAME,  dataLPQ[i].dimension, dataLPQ[i].index, myid);
-      }
+      //}
     }
   }
 }
