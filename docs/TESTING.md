@@ -47,6 +47,17 @@ available. Benchmark helpers are retained separately from correctness
 checks; benchmark output must not be interpreted as proof of physical
 correctness.
 
+## Quantity-selector unit tests
+
+The selector can be tested without MPI, density-matrix files, or HDF5.
+The test compiles the production selector C source with GCC in a
+temporary directory under `tests/` and checks all presets, collinear
+and noncollinear spin modes, combination rules, and invalid requests:
+
+~~~bash
+python3 tests/test_output_quantities.py
+~~~
+
 ## Baseline release evidence
 
 The release-preparation audit references previously completed P1–P6 tests.

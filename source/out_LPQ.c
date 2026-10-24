@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <omp.h>
 #include "Local_physical_quantities.h"
+#include "FLPQ_Quantity_Selector.h"
 #include "FLPQ_HDF5.h"
 #include <sys/stat.h>
 #include <errno.h>
@@ -182,42 +183,23 @@ void out_LPQ2()
     {".stress",2,0,0}, {".stress_S",2,1,0}, {".stress_A",2,2,0}
   };
   int size_dataLPQ = (int)(sizeof(dataLPQ) / sizeof(dataLPQ[0]));
-  int active[32] = {0}, selected[32] = {0}, ntypes=size_dataLPQ+3;
+  int selected[32] = {0}, ntypes=size_dataLPQ+3;
   const Struct_LPQ *item[32];
-  int all_requested;
+  FLPQ_Quantity_Descriptor descriptors[32];
+  char selection_error[256];
   if(ntypes>32)flpq_quantity_error("too many registered quantities",NULL);
-  for(i=0;i<size_dataLPQ;i++){
-    item[i]=&dataLPQ[i];
-    active[i]=(dataLPQ[i].SpinP_switch==0 || SpinP_switch==3);
+  for(i=0;i<size_dataLPQ;i++) item[i]=&dataLPQ[i];
+  for(i=0;i<3;i++) item[size_dataLPQ+i]=&optional_stress[i];
+  for(i=0;i<ntypes;i++){
+    descriptors[i].name=item[i]->LPQNAME+1;
+    descriptors[i].dimension=item[i]->dimension;
+    descriptors[i].noncollinear_only=item[i]->SpinP_switch==3;
+    descriptors[i].optional_stress=i>=size_dataLPQ;
   }
-  for(i=0;i<3;i++){
-    item[size_dataLPQ+i]=&optional_stress[i];
-    active[size_dataLPQ+i]=FLPQ_Output_Stress_Decomposition!=0;
-  }
-  all_requested=(strcasecmp(FLPQ_Output_Quantities,"all")==0);
-  if(all_requested){
-    for(i=0;i<ntypes;i++)selected[i]=active[i];
-  }
-  else{
-    char buffer[sizeof(FLPQ_Output_Quantities)];
-    char *cursor, *save=NULL;
-    int count=0;
-    memcpy(buffer,FLPQ_Output_Quantities,sizeof(buffer));
-    for(cursor=strtok_r(buffer,", \t\r\n",&save);cursor;
-        cursor=strtok_r(NULL,", \t\r\n",&save)){
-      int match=-1, t;
-      if(!strcasecmp(cursor,"all"))
-        flpq_quantity_error("all cannot be mixed with specific names",cursor);
-      for(t=0;t<ntypes;t++)
-        if(!strcasecmp(cursor,item[t]->LPQNAME+1)){match=t;break;}
-      if(match<0)flpq_quantity_error("unknown or unsupported name",cursor);
-      if(item[match]->SpinP_switch==3 && SpinP_switch!=3)
-        flpq_quantity_error("requires noncollinear spin mode",cursor);
-      if(selected[match])flpq_quantity_error("duplicate name",cursor);
-      selected[match]=1;count++;
-    }
-    if(count==0)flpq_quantity_error("no quantity selected",NULL);
-  }
+  if(flpq_select_output_quantities(FLPQ_Output_Quantities,descriptors,ntypes,
+                                   SpinP_switch,FLPQ_Output_Stress_Decomposition,
+                                   selected,selection_error,sizeof(selection_error))!=0)
+    flpq_quantity_error(selection_error,NULL);
   /* Fail before generating any selected HDF5 file, not partway through.
    * The .partial file is deliberately never deleted automatically.
    * Explicit replace only swaps the final file after successful HDF5 close.

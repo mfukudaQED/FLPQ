@@ -23,7 +23,7 @@ atom positions, labels, field unit metadata and component ordering.
 | Input name | Values | Default |
 | --- | --- | --- |
 | Output.Format | legacy, hdf5, both | legacy |
-| Output.Quantities | all or comma/space-separated names | all |
+| Output.Quantities | all, all_scalar, all_vector, all_tensor, basic, rcp, or comma/space-separated quantities/presets | all |
 | Output.HDF5.Precision | float64, float32 | float64 |
 | Output.HDF5.Compression | gzip, none | gzip |
 | Output.HDF5.GzipLevel | 0–9 | 4 |
@@ -33,11 +33,13 @@ atom positions, labels, field unit metadata and component ordering.
 | Output.HDF5.BlockPoints | 16–8192 | 512 |
 | Output.HDF5.LogPerformance | on, off | off |
 
-Common quantity names include electron_density, kinetic_energy_density,
-energy_density_tau, chemical_potential, charge_current, kinetic_momentum,
-spin_vorticity, spin_angular_momentum, stress_diag, stress, stress_S,
-and stress_A. Spin-dependent fields are only available in compatible spin
-modes. Invalid/duplicate keywords and unavailable quantities are rejected.
+See the **[complete quantity and preset reference](OUTPUT_QUANTITIES.md)**
+for all 14 names, scalar/vector/tensor groupings, the `basic` and `rcp`
+presets, combinations, and spin-mode restrictions. The default `all`
+retains historical output behavior. Presets skip spin-incompatible members,
+whereas explicitly requesting an incompatible individual quantity is an
+error. Duplicate explicit quantity names and `all` mixed with other tokens
+remain errors.
 
 The stress_diag data contains three eigenvalues and nine eigenvector
 components. It is not simply a nine-component stress tensor. Eigenvector

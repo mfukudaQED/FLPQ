@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.2.1 — 2026-10-24
+
+This maintenance release adds named presets for selecting local physical
+quantities, available in both legacy dat/Cube and HDF5 output modes.
+
+### Added
+
+- `Output.Quantities all_scalar`, `all_vector`, and `all_tensor` to select
+  entire categories of registered physical quantities.
+- `Output.Quantities basic` for electron density, spin angular momentum,
+  and (in noncollinear calculations) zeta potential.
+- `Output.Quantities rcp` for kinetic energy density and local chemical
+  potential.
+- Composable presets and explicit quantity names, with spin-mode validation
+  and preservation of the historical standalone `all` behavior.
+- A complete quantity reference linked from the README, plus standalone
+  quantity-selector regression tests.
+
+### Compatibility
+
+- The default `Output.Quantities all` and default legacy output remain
+  unchanged.
+- Existing explicit quantity selections remain supported.
+- Spin-incompatible preset members are skipped; explicitly requesting an
+  incompatible individual quantity is still an error.
+- Selection affects quantity evaluation and output; shared grid preparation
+  is unchanged.
+
 ## v0.2.0 — 2026-10-24
 
 This release adds optional HDF5 output, output validation and conversion

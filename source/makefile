@@ -53,6 +53,7 @@ OBJS    = main_flpq.o \
           Set_ddDensity_Grid_fuku_i.o\
           Set_dd2Density_Grid_fuku_i.o\
           out_LPQ.o\
+           FLPQ_Quantity_Selector.o\
           Local_physical_quantities.o\
 		  Set_Allocate_Atom2CPU.o\
           Set_Inf_SndRcv.o\
@@ -146,8 +147,10 @@ Set_ddDensity_Grid_fuku_i.o: Set_ddDensity_Grid_fuku_i.c flpq.h
 	$(CC) -c Set_ddDensity_Grid_fuku_i.c
 Set_dd2Density_Grid_fuku_i.o: Set_dd2Density_Grid_fuku_i.c flpq.h
 	$(CC) -c Set_dd2Density_Grid_fuku_i.c
-out_LPQ.o: out_LPQ.c flpq.h Local_physical_quantities.h FLPQ_HDF5.h
+out_LPQ.o: out_LPQ.c flpq.h Local_physical_quantities.h FLPQ_HDF5.h FLPQ_Quantity_Selector.h
 	$(CC) -c out_LPQ.c
+FLPQ_Quantity_Selector.o: FLPQ_Quantity_Selector.c FLPQ_Quantity_Selector.h
+	$(CC) -c FLPQ_Quantity_Selector.c
 Local_physical_quantities.o: Local_physical_quantities.c flpq.h Local_physical_quantities.h
 	$(CC) -c Local_physical_quantities.c
 Set_Allocate_Atom2CPU.o: Set_Allocate_Atom2CPU.c flpq.h

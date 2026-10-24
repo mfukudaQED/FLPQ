@@ -126,6 +126,7 @@ Input keyword meanings and defaults:
 | Grid_vectors block | Three vectors defining the local-quantity box | Lattice vectors from OpenMX |
 | save_memory_3d | Enable slice-by-slice, reduced-memory calculation | off |
 | Output.Format | Choose legacy, hdf5, or both | legacy |
+| Output.Quantities | basic, all, all_scalar, rcp, etc. | all |
 
 **Important correction from v0.1.0:** The previous README used
 "dens_origin_unit" (underscores), whereas the actual input reader
@@ -134,6 +135,24 @@ recognizes "dens_origin.unit" (with a dot). Use the latter.
 If dens_origin, Dens_Ngrid, or the Grid_vectors block is omitted, the
 relevant automatic/default behavior applies. The example above
 explicitly selects the spatial box and calculation grid.
+
+## Selecting physical quantities
+
+Use `Output.Quantities` in `flpq.inp` to select individual fields or
+predefined groups. This works with legacy and HDF5 output:
+
+~~~text
+Output.Quantities basic
+~~~
+
+Supported presets are `all` (the historical default), `all_scalar`,
+`all_vector`, `all_tensor`, `basic` (electron density, spin angular
+momentum and noncollinear zeta potential), and `rcp` (kinetic energy
+density and chemical potential). The noncollinear-only field in
+`basic` is omitted for other spin modes.
+
+See **[the complete list of selectable physical quantities and presets](docs/OUTPUT_QUANTITIES.md)**
+for every quantity name, spin restrictions, combination rules, and examples.
 
 ## Output formats
 
