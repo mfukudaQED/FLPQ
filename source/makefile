@@ -88,6 +88,16 @@ OBJS    += leakdetect.o
 endif
 
 
+# Optional HDF5 writer (default: legacy-only with no HDF5 dependency).
+HDF5 ?= 0
+ifeq ($(HDF5),1)
+HDF5_OBJ = FLPQ_HDF5.o
+LIB += -lhdf5
+else
+HDF5_OBJ = FLPQ_HDF5_stub.o
+endif
+OBJS += $(HDF5_OBJ)
+
 ### flpq ###
 
 flpq:	$(OBJS)
@@ -136,7 +146,7 @@ Set_ddDensity_Grid_fuku_i.o: Set_ddDensity_Grid_fuku_i.c flpq.h
 	$(CC) -c Set_ddDensity_Grid_fuku_i.c
 Set_dd2Density_Grid_fuku_i.o: Set_dd2Density_Grid_fuku_i.c flpq.h
 	$(CC) -c Set_dd2Density_Grid_fuku_i.c
-out_LPQ.o: out_LPQ.c flpq.h Local_physical_quantities.h
+out_LPQ.o: out_LPQ.c flpq.h Local_physical_quantities.h FLPQ_HDF5.h
 	$(CC) -c out_LPQ.c
 Local_physical_quantities.o: Local_physical_quantities.c flpq.h Local_physical_quantities.h
 	$(CC) -c Local_physical_quantities.c
@@ -158,3 +168,10 @@ Free_Arrays_in_Set_Grid.o: Free_Arrays_in_Set_Grid.c flpq.h
 
 clean:
 	rm -f $(PROG) $(OBJS) *.optrpt *.o *.mod *dbg
+
+
+FLPQ_HDF5.o: FLPQ_HDF5.c FLPQ_HDF5.h Local_physical_quantities.h flpq.h
+	$(CC) -c FLPQ_HDF5.c
+
+FLPQ_HDF5_stub.o: FLPQ_HDF5_stub.c FLPQ_HDF5.h flpq.h
+	$(CC) -c FLPQ_HDF5_stub.c

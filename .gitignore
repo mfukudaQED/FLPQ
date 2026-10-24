@@ -1,5 +1,38 @@
+# Compiler-generated files
 *.o
 *.mod
+*.optrpt
+source/flpq
+source/conv_dat2cube
 make.log
-flpq
+build/
+dist/
+
+# Python caches and environments
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.env
+.env.*
+
+# Scientific run products and raw OpenMX exports
+LPQ/
+OpenMX_LPQ.bin
+OpenMX_LPQ_DM/
+*.partial.h5
+*.h5
+*.hdf5
+*.cube
+*.fieldcube
+flpq.log
 slurm-*
+*.out
+*.err
+
+# Editor/temp files
+*.swp
+*.swo
+*~
+core
+core.*

@@ -13,13 +13,17 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <strings.h>
+#include <ctype.h>
 #include <time.h>
 #include "flpq.h"
 #include "mpi.h"
 #include <unistd.h>
 #include <omp.h>
 #include "Local_physical_quantities.h"
+#include "FLPQ_HDF5.h"
 #include <sys/stat.h>
+#include <errno.h>
 
 typedef struct {
   char LPQNAME[50];
@@ -28,12 +32,22 @@ typedef struct {
   int SpinP_switch;
 } Struct_LPQ;
 
-static void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid);
+static void calc_LPQ(const char *fileLPQ, int norder, int numLPQ, int myid);
 static void Print_LPQ_3D(FILE *fp, char fext[], int norder, int numLPQ);
 static void Print_CubeTitle(FILE *fp);
 static void Print_CubeData(FILE *fp, char fext[], int numLPQ);
-static void Merge_Files(FILE *fp, char fext[], int numLPQ);
+static void Merge_Files(const char *fext);
 static void Print_Density_Grid();
+static void flpq_quantity_error(const char *msg, const char *quantity)
+{
+  int me;
+  MPI_Comm_rank(mpi_comm_level1,&me);
+  fprintf(stderr,"[FLPQ rank %d] Output.Quantities: %s %s\n",
+          me,msg,quantity?quantity:"");
+  fflush(stderr);
+  MPI_Abort(mpi_comm_level1,EXIT_FAILURE);
+}
+
 
 /* added by fukuda 11.May.2015 */
 void out_LPQ()
@@ -163,88 +177,149 @@ void out_LPQ2()
     //{".stress_nonrel_beta",         2, 7, 0}
   };
 
-  int size_dataLPQ = sizeof(dataLPQ) / sizeof(dataLPQ[0]);
-
-  for (int i = 0; i < size_dataLPQ; i++) {
-    if(SpinP_switch<3){
-      if(dataLPQ[i].SpinP_switch==0){
-        calc_LPQ(dataLPQ[i].LPQNAME,  dataLPQ[i].dimension, dataLPQ[i].index, myid);
-      }
+  /* Ordinary defaults remain identical to F3; decomposition remains opt-in. */
+  const Struct_LPQ optional_stress[] = {
+    {".stress",2,0,0}, {".stress_S",2,1,0}, {".stress_A",2,2,0}
+  };
+  int size_dataLPQ = (int)(sizeof(dataLPQ) / sizeof(dataLPQ[0]));
+  int active[32] = {0}, selected[32] = {0}, ntypes=size_dataLPQ+3;
+  const Struct_LPQ *item[32];
+  int all_requested;
+  if(ntypes>32)flpq_quantity_error("too many registered quantities",NULL);
+  for(i=0;i<size_dataLPQ;i++){
+    item[i]=&dataLPQ[i];
+    active[i]=(dataLPQ[i].SpinP_switch==0 || SpinP_switch==3);
+  }
+  for(i=0;i<3;i++){
+    item[size_dataLPQ+i]=&optional_stress[i];
+    active[size_dataLPQ+i]=FLPQ_Output_Stress_Decomposition!=0;
+  }
+  all_requested=(strcasecmp(FLPQ_Output_Quantities,"all")==0);
+  if(all_requested){
+    for(i=0;i<ntypes;i++)selected[i]=active[i];
+  }
+  else{
+    char buffer[sizeof(FLPQ_Output_Quantities)];
+    char *cursor, *save=NULL;
+    int count=0;
+    memcpy(buffer,FLPQ_Output_Quantities,sizeof(buffer));
+    for(cursor=strtok_r(buffer,", \t\r\n",&save);cursor;
+        cursor=strtok_r(NULL,", \t\r\n",&save)){
+      int match=-1, t;
+      if(!strcasecmp(cursor,"all"))
+        flpq_quantity_error("all cannot be mixed with specific names",cursor);
+      for(t=0;t<ntypes;t++)
+        if(!strcasecmp(cursor,item[t]->LPQNAME+1)){match=t;break;}
+      if(match<0)flpq_quantity_error("unknown or unsupported name",cursor);
+      if(item[match]->SpinP_switch==3 && SpinP_switch!=3)
+        flpq_quantity_error("requires noncollinear spin mode",cursor);
+      if(selected[match])flpq_quantity_error("duplicate name",cursor);
+      selected[match]=1;count++;
     }
-    else{
-      //if(dataLPQ[i].SpinP_switch==3){
-        calc_LPQ(dataLPQ[i].LPQNAME,  dataLPQ[i].dimension, dataLPQ[i].index, myid);
-      //}
+    if(count==0)flpq_quantity_error("no quantity selected",NULL);
+  }
+  /* Fail before generating any selected HDF5 file, not partway through.
+   * The .partial file is deliberately never deleted automatically.
+   * Explicit replace only swaps the final file after successful HDF5 close.
+   */
+  if (myid==Host_ID && N_loop_Ngrid1==0 && FLPQ_Output_Format!=0){
+    for(i=0;i<ntypes;i++) if(selected[i]){
+      char final[YOUSO10],partial[YOUSO10];
+      struct stat st;
+      if(snprintf(final,sizeof(final),"%s/LPQ%s.h5",DirnameLPQ,
+                  item[i]->LPQNAME)>=(int)sizeof(final) ||
+         snprintf(partial,sizeof(partial),"%s/LPQ%s.partial.h5",
+                  DirnameLPQ,item[i]->LPQNAME)>=(int)sizeof(partial))
+        flpq_quantity_error("output path too long",item[i]->LPQNAME);
+      if(lstat(partial,&st)==0)
+        flpq_quantity_error("partial HDF5 exists; intervention needed",partial);
+      if(lstat(final,&st)==0){
+        if(FLPQ_HDF5_OnExisting==0)
+          flpq_quantity_error("HDF5 exists, refusing overwrite",final);
+        if(!S_ISREG(st.st_mode))
+          flpq_quantity_error("replacement target is not a regular file",final);
+      }
     }
   }
+  MPI_Barrier(mpi_comm_level1);
+  for(i=0;i<ntypes;i++) if(selected[i])
+    calc_LPQ(item[i]->LPQNAME,item[i]->dimension,item[i]->index,myid);
+
 }
 
-void calc_LPQ(char fileLPQ[YOUSO10], int norder, int numLPQ, int myid)
+static void flpq_output_fail(const char *action, const char *path)
 {
-  char fname[YOUSO10];
-  char fileLPQext[YOUSO10];
-  FILE *fp;
-  int fd;
-
-    /* for QEDynamics, LPQ.*.dat */
-    sprintf(fileLPQext,"%s.dat",fileLPQ);
-    sprintf(fname,"%s/LPQ%s_%i",DirnameLPQ,fileLPQext,myid);
-    if ((fp = fopen(fname,"w")) != NULL){
-      Print_LPQ_3D(fp, fileLPQext, norder, numLPQ);
-      fflush(fp);
-      fd = fileno(fp); 
-      fsync(fd);
-      fclose(fp);
-
-      MPI_Barrier(mpi_comm_level1);
-      if (myid==Host_ID){
-        Merge_Files(fp, fileLPQext, numLPQ);
-      }
-    }
-    else{
-      printf("Failure of saving the %s\n",fname);
-    }
-
-    if (flag_save_memory_3d==0){
-      if(norder==0){ /* scalar */
-        if((Ngrid1!=1)&&(Ngrid2!=1)&&(Ngrid3!=1)){
-          /* for QEDynamics, LPQ.*.cube */
-          sprintf(fileLPQext,"%s.cube",fileLPQ);
-          sprintf(fname,"%s/LPQ%s_%i",DirnameLPQ,fileLPQext,myid);
-          if ((fp = fopen(fname,"w")) != NULL){
-            if (myid==Host_ID){
-              Print_CubeTitle(fp);
-            }
-
-            Print_CubeData(fp, fileLPQext, numLPQ);
-
-            fflush(fp);
-            fd = fileno(fp); 
-            fsync(fd);
-            fclose(fp);
-
-            if (myid==Host_ID){
-              Merge_Files(fp, fileLPQext, numLPQ);
-            }
-          }
-          else{
-            printf("Failure of saving the %s\n",fname);
-          }
-        }
-      }
-    }
-
-    if ((myid==Host_ID)&&(N_loop_Ngrid1==0)){
-      sprintf(fname,"%s/header.cube",DirnameLPQ);
-      if ((fp = fopen(fname,"w")) != NULL){
-        Print_CubeTitle(fp);
-        fflush(fp);
-        fclose(fp);
-      }
-
-    }
+  int rank;
+  MPI_Comm_rank(mpi_comm_level1, &rank);
+  fprintf(stderr, "[FLPQ rank %d] %s %s: %s\n",
+          rank, action, path, strerror(errno));
+  fflush(stderr);
+  MPI_Abort(mpi_comm_level1, EXIT_FAILURE);
 }
 
+static void flpq_output_close(FILE *fp, const char *path)
+{
+  if (fclose(fp) != 0) flpq_output_fail("cannot close", path);
+}
+
+static void calc_LPQ(const char *fileLPQ, int norder, int numLPQ, int myid)
+{
+  char fname[YOUSO10], fileLPQext[YOUSO10];
+  FILE *fp;
+
+  if (FLPQ_Output_Format != 0)
+    FLPQ_HDF5_write(fileLPQ, norder, numLPQ);
+  if (FLPQ_Output_Format == 1) return;
+
+  if (snprintf(fileLPQext, sizeof(fileLPQext), "%s.dat", fileLPQ)
+      >= (int)sizeof(fileLPQext) ||
+      snprintf(fname, sizeof(fname), "%s/LPQ%s_%d",
+               DirnameLPQ, fileLPQext, myid) >= (int)sizeof(fname)) {
+    errno = ENAMETOOLONG;
+    flpq_output_fail("output path too long", fileLPQ);
+  }
+  fp = fopen(fname, "w");
+  if (fp == NULL) flpq_output_fail("cannot open", fname);
+  Print_LPQ_3D(fp, fileLPQext, norder, numLPQ);
+  flpq_output_close(fp, fname);
+
+  /* Every fragment must be closed before rank zero starts merging. */
+  MPI_Barrier(mpi_comm_level1);
+  if (myid == Host_ID) Merge_Files(fileLPQext);
+  MPI_Barrier(mpi_comm_level1);
+
+  if (flag_save_memory_3d == 0 && norder == 0 &&
+      Ngrid1 != 1 && Ngrid2 != 1 && Ngrid3 != 1) {
+    if (snprintf(fileLPQext, sizeof(fileLPQext), "%s.cube", fileLPQ)
+        >= (int)sizeof(fileLPQext) ||
+        snprintf(fname, sizeof(fname), "%s/LPQ%s_%d",
+                 DirnameLPQ, fileLPQext, myid) >= (int)sizeof(fname)) {
+      errno = ENAMETOOLONG;
+      flpq_output_fail("output path too long", fileLPQ);
+    }
+    fp = fopen(fname, "w");
+    if (fp == NULL) flpq_output_fail("cannot open", fname);
+    if (myid == Host_ID) Print_CubeTitle(fp);
+    Print_CubeData(fp, fileLPQext, numLPQ);
+    flpq_output_close(fp, fname);
+
+    MPI_Barrier(mpi_comm_level1);
+    if (myid == Host_ID) Merge_Files(fileLPQext);
+    MPI_Barrier(mpi_comm_level1);
+  }
+
+  if (myid == Host_ID && N_loop_Ngrid1 == 0) {
+    if (snprintf(fname, sizeof(fname), "%s/header.cube", DirnameLPQ)
+        >= (int)sizeof(fname)) {
+      errno = ENAMETOOLONG;
+      flpq_output_fail("output path too long", DirnameLPQ);
+    }
+    fp = fopen(fname, "w");
+    if (fp == NULL) flpq_output_fail("cannot open", fname);
+    Print_CubeTitle(fp);
+    flpq_output_close(fp, fname);
+  }
+}
 
 /* added by fukuda 21.May.2023 */
 static void Print_Density_Grid()
@@ -580,70 +655,52 @@ static void Print_CubeData(FILE *fp, char fext[], int numLPQ)
   //}
 }
 
-static void Merge_Files(FILE *fp, char fext[], int numLPQ)
+static void Merge_Files(const char *fext)
 {
-  int numprocs,ID,digit,c;
-  char operate[500],operate1[500],operate2[500];
-  FILE *fp1,*fp2;
+  int numprocs, rank;
+  char output_path[YOUSO10], fragment_path[YOUSO10];
+  char buffer[65536];
+  FILE *output, *fragment;
+  size_t count;
 
-  /****************************************************
-                   merge files
-  ****************************************************/
+  MPI_Comm_size(mpi_comm_level1, &numprocs);
+  if (snprintf(output_path, sizeof(output_path), "%s/LPQ%s",
+               DirnameLPQ, fext) >= (int)sizeof(output_path)) {
+    errno = ENAMETOOLONG;
+    flpq_output_fail("output path too long", fext);
+  }
 
-  /* MPI */
-  MPI_Comm_size(mpi_comm_level1,&numprocs);
-  digit = (int)log10(numprocs) + 1;
+  /* The first slice replaces old output; later slices are appended. */
+  output = fopen(output_path, N_loop_Ngrid1 == 0 ? "wb" : "ab");
+  if (output == NULL) flpq_output_fail("cannot open", output_path);
 
-
-  //sprintf(operate,"cat %s/LPQ%s_0 > %s/LPQ%s",
-  //        DirnameLPQ, fext, DirnameLPQ,fext);
-  //system(operate);
-
-  //for (ID=1; ID<numprocs; ID++){
-  //  sprintf(operate,"cat %s/LPQ%s_%i >> %s/LPQ%s",
-  //          DirnameLPQ,fext,ID, DirnameLPQ,fext);
-  //  system(operate);
-  //}
-
-  //for (ID=0; ID<numprocs; ID++){
-  //  sprintf(operate,"rm %s/LPQ%s_%i",DirnameLPQ, fext,ID);
-  //  system(operate);
-  //}
-
-
-  sprintf(operate1,"%s/LPQ%s",DirnameLPQ,fext);
-  //fp1 = fopen(operate1, "r");   
-
-  //if (fp1!=NULL){
-  //  fclose(fp1); 
-  //  remove(operate1);
-  //}
-
-  /* merge all the fraction files */
-
-  for (ID=0; ID<numprocs; ID++){
-
-    sprintf(operate1,"%s/LPQ%s",DirnameLPQ,fext);
-    fp1 = fopen(operate1, "a");   
-    fseek(fp1,0,SEEK_END);
-
-    sprintf(operate2,"%s/LPQ%s_%i",DirnameLPQ,fext,ID);
-    fp2 = fopen(operate2,"r");
-
-    if (fp2!=NULL){
-      for (c=getc(fp2); c!=EOF; c=getc(fp2))  putc(c,fp1); 
-      fclose(fp2); 
+  for (rank = 0; rank < numprocs; rank++) {
+    if (snprintf(fragment_path, sizeof(fragment_path), "%s/LPQ%s_%d",
+                 DirnameLPQ, fext, rank) >= (int)sizeof(fragment_path)) {
+      errno = ENAMETOOLONG;
+      flpq_output_fail("fragment path too long", fext);
     }
+    fragment = fopen(fragment_path, "rb");
+    if (fragment == NULL) flpq_output_fail("cannot open", fragment_path);
 
-    fclose(fp1); 
-  
+    while ((count = fread(buffer, 1, sizeof(buffer), fragment)) != 0) {
+      if (fwrite(buffer, 1, count, output) != count)
+        flpq_output_fail("cannot write", output_path);
+    }
+    if (ferror(fragment)) flpq_output_fail("cannot read", fragment_path);
+    flpq_output_close(fragment, fragment_path);
   }
+  flpq_output_close(output, output_path);
 
-  for (ID=0; ID<numprocs; ID++){
-    sprintf(operate,"%s/LPQ%s_%i",DirnameLPQ,fext,ID);
-    remove(operate);
+  /* Delete fragments only after the complete destination is closed. */
+  for (rank = 0; rank < numprocs; rank++) {
+    if (snprintf(fragment_path, sizeof(fragment_path), "%s/LPQ%s_%d",
+                 DirnameLPQ, fext, rank) >= (int)sizeof(fragment_path)) {
+      errno = ENAMETOOLONG;
+      flpq_output_fail("fragment path too long", fext);
+    }
+    if (remove(fragment_path) != 0) flpq_output_fail("cannot remove", fragment_path);
   }
-
 }
 #endif
 

@@ -16,7 +16,26 @@
 #include <math.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include "flpq.h"
+
+static void flpq_dm_fail(const char *action, const char *path)
+{
+  int rank;
+  MPI_Comm_rank(mpi_comm_level1, &rank);
+  fprintf(stderr, "[FLPQ rank %d] %s %s: %s\n", rank, action, path, strerror(errno));
+  fflush(stderr);
+  MPI_Abort(mpi_comm_level1, EXIT_FAILURE);
+}
+
+static void flpq_dm_read(void *dst, size_t size, size_t count, FILE *fp, const char *path)
+{
+  if (fread(dst, size, count, fp) != count) {
+    if (!ferror(fp)) errno = EIO;
+    flpq_dm_fail("short read from", path);
+  }
+}
+#define FLPQ_READ_EXACT(P,S,N,F) flpq_dm_read((P),(S),(N),(F),fname)
 
 void read_input_DM( int kloop, int mu )
 {
@@ -77,16 +96,14 @@ void read_input_DM( int kloop, int mu )
       if(flag_DMmu_range==1){
         sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DMmu_%d.bin",spin);
         if ((fp = fopen(fname,"rb")) == NULL){
-          printf("cannot open %s \n", fname);
-          exit(0);
+          flpq_dm_fail("cannot open", fname);
         }
       }
 
       else if((flag_DMmu==0)&&(flag_DMk==0)){
         sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d.bin",spin);
         if ((fp = fopen(fname,"rb")) == NULL){
-          printf("cannot open %s \n", fname);
-          exit(0);
+          flpq_dm_fail("cannot open", fname);
         }
       }
 
@@ -94,8 +111,7 @@ void read_input_DM( int kloop, int mu )
         if(spin==Num_DM_spin){
           sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d_%08d.bin",spin,mu);
           if ((fp = fopen(fname,"rb")) == NULL){
-            printf("cannot open %s \n", fname);
-            exit(0);
+            flpq_dm_fail("cannot open", fname);
           }
         }
       }
@@ -105,15 +121,14 @@ void read_input_DM( int kloop, int mu )
           sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d_%08d_%08d.bin",spin,kloop,mu);
           //printf("read %s\n",fname);
           if ((fp = fopen(fname,"rb")) == NULL){
-            printf("cannot open %s \n", fname);
-            exit(0);
+            flpq_dm_fail("cannot open", fname);
           }
         }
       }
 
       else {
-        printf("error flag_DMmu, flag_DMk\n");
-        exit(0);
+        errno = EINVAL;
+        flpq_dm_fail("invalid DM selection for", "flpq.inp");
       }
 
       //printf("read %s\n",fname);
@@ -147,7 +162,7 @@ void read_input_DM( int kloop, int mu )
             wan2 = WhatSpecies[Gh_AN];
             TNO2 = Spe_Total_CNO[wan2];
             for (i=0; i<TNO1; i++){
-              fread(DM_full[spin][Gc_AN][h_AN][i],sizeof(double),TNO2,fp);
+              FLPQ_READ_EXACT(DM_full[spin][Gc_AN][h_AN][i],sizeof(double),TNO2,fp);
               //for (j=0; j<TNO2; j++){
               //  printf("%lf\n",DM_full[spin][Gc_AN][h_AN][i][j]);
               //}
@@ -248,7 +263,7 @@ void read_input_DM( int kloop, int mu )
   //        wanB = WhatSpecies[GB_AN];
   //        tnoB = Spe_Total_CNO[wanB];
   //        for (i=0; i<tnoA; i++){
-  //          fread(DM[0][spin][MA_AN][LB_AN][i],sizeof(double),tnoB,fp);
+  //          FLPQ_READ_EXACT(DM[0][spin][MA_AN][LB_AN][i],sizeof(double),tnoB,fp);
   //        }
   //      }
   //    }
@@ -300,16 +315,14 @@ void read_input_DM( int kloop, int mu )
       if(flag_DMmu_range==1){
         sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DMmu_%d.bin",spin+SpinP_switch+1);
         if ((fp = fopen(fname,"rb")) == NULL){
-          printf("cannot open %s \n", fname);
-          exit(0);
+          flpq_dm_fail("cannot open", fname);
         }
       }
 
       else if((flag_DMmu==0)&&(flag_DMk==0)){
         sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d.bin",spin+SpinP_switch+1);
         if ((fp = fopen(fname,"rb")) == NULL){
-          printf("cannot open %s \n", fname);
-          exit(0);
+          flpq_dm_fail("cannot open", fname);
         }
       }
 
@@ -317,8 +330,7 @@ void read_input_DM( int kloop, int mu )
         if(spin==Num_DM_spin){
           sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d_%08d.bin",spin+SpinP_switch+1,mu);
           if ((fp = fopen(fname,"rb")) == NULL){
-            printf("cannot open %s \n", fname);
-            exit(0);
+            flpq_dm_fail("cannot open", fname);
           }
         }
       }
@@ -327,17 +339,15 @@ void read_input_DM( int kloop, int mu )
         if(spin==Num_DM_spin){
           sprintf(fname,"OpenMX_LPQ_DM/OpenMX_LPQ_DM_%d_%08d_%08d.bin",spin+SpinP_switch+1,kloop,mu);
           if ((fp = fopen(fname,"rb")) == NULL){
-            printf("cannot open %s \n", fname);
-            exit(0);
+            flpq_dm_fail("cannot open", fname);
           }
         }
       }
 
       else {
-        printf("error flag_DMmu, flag_DMk\n");
-        exit(0);
+        errno = EINVAL;
+        flpq_dm_fail("invalid DM selection for", "flpq.inp");
       }
-      printf("read %s\n",fname);
       /*** ***/
 
       if((flag_DMmu==1)&&(spin!=Num_DM_spin)){
@@ -350,7 +360,7 @@ void read_input_DM( int kloop, int mu )
             wan2 = WhatSpecies[Gh_AN];
             TNO2 = Spe_Total_CNO[wan2];
             for (i=0; i<TNO1; i++){
-              fread(iDM_full[spin][Gc_AN][h_AN][i],sizeof(double),TNO2,fp);
+              /* Unselected spin blocks are zero without reading an unopened stream. */
               for (j=0; j<TNO2; j++){
                 iDM_full[spin][Gc_AN][h_AN][i][j] = 0.0;
               }
@@ -368,7 +378,7 @@ void read_input_DM( int kloop, int mu )
             wan2 = WhatSpecies[Gh_AN];
             TNO2 = Spe_Total_CNO[wan2];
             for (i=0; i<TNO1; i++){
-              fread(iDM_full[spin][Gc_AN][h_AN][i],sizeof(double),TNO2,fp);
+              FLPQ_READ_EXACT(iDM_full[spin][Gc_AN][h_AN][i],sizeof(double),TNO2,fp);
               //for (j=0; j<TNO2; j++){
               //  printf("%18.8E\n",iDM_full[spin][Gc_AN][h_AN][i][j]);
               //}
@@ -468,7 +478,7 @@ void read_input_DM( int kloop, int mu )
   //        wanB = WhatSpecies[GB_AN];
   //        tnoB = Spe_Total_CNO[wanB];
   //        for (i=0; i<tnoA; i++){
-  //          fread(iDM[0][spin][MA_AN][LB_AN][i],sizeof(double),tnoB,fp);
+  //          FLPQ_READ_EXACT(iDM[0][spin][MA_AN][LB_AN][i],sizeof(double),tnoB,fp);
   //        }
   //      }
   //    }

@@ -62,7 +62,8 @@ void Free_Arrays()
   free(DM); 
 
   if ((Solver==4)||(SpinP_switch>1)){
-    for (spin=0; spin<=SpinP_switch; spin++){
+    /* iDM has two spin components, irrespective of SpinP_switch. */
+    for (spin=0; spin<2; spin++){
       for (Mc_AN=0; Mc_AN<=Matomnum; Mc_AN++){
 
         if (Mc_AN==0){

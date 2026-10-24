@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
   static int MD_iter,i,j,po,ip,n1;
   double TStime,TEtime;
   int kloop,mu;
-  char filename[100];
+  const char *filename;
 
   /* MPI initialize */
 
@@ -40,13 +40,12 @@ int main(int argc, char *argv[])
   MYID_MPI_COMM_WORLD = myid;
   Num_Procs = numprocs;
 
-  /* check argv */
-
-  //if (argc==1){
-  //  printf("\nCould not find an input file.\n\n");
-  //  MPI_Finalize(); 
-  //  exit(0);
-  //} 
+  /* Accept an explicit input path while retaining the legacy default. */
+  if (argc > 2) {
+    if (myid == Host_ID) fprintf(stderr, "Usage: flpq [input_file]\n");
+    MPI_Abort(mpi_comm_level1, EXIT_FAILURE);
+  }
+  filename = (argc == 2) ? argv[1] : "flpq.inp";
 
 
 #ifdef LEAK_DETECT
@@ -64,15 +63,14 @@ int main(int argc, char *argv[])
                read input from flpq.inp
   *****************************************************/
   if (myid==Host_ID){  
-         printf("start reading flpq.inp\n");
+         printf("start reading %s\n", filename);
   }
   //read_input_flpq();
-  sprintf(filename, "flpq.inp");
-  Input_std(filename);
+  Input_std((char *)filename);
 
   //MPI_Barrier(MPI_COMM_WORLD);
   if (myid==Host_ID){  
-    printf("end reading flpq.inp\n");
+    printf("end reading %s\n", filename);
   }
 
   /*****************************************************

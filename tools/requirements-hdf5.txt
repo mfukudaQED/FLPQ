@@ -1,0 +1,4 @@
+# FLPQ HDF5 conversion CLI (Python >= 3.9)
+# Tested with Python 3.13, NumPy 2.5.4, and h5py 3.16.0.
+numpy>=1.26,<3
+h5py>=3.12,<4

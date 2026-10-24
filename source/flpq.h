@@ -960,6 +960,17 @@ double Set_dDensity_Grid_i(double *****CDM);
 double Set_ddDensity_Grid_i(double *****CDM);
 double Set_dd2Density_Grid_i(double *****CDM);
 void out_LPQ();
+/* Optional output of full/symmetric/antisymmetric stress tensors. */
+extern int FLPQ_Output_Stress_Decomposition;
+extern int FLPQ_Output_Format; /* 0=legacy; 1=hdf5; 2=both */
+extern char FLPQ_Output_Quantities[1024];
+extern int FLPQ_HDF5_Precision; /* 32 or 64 */
+extern int FLPQ_HDF5_Compression; /* 0 none, 1 gzip */
+extern int FLPQ_HDF5_GzipLevel; /* 0..9 */
+extern int FLPQ_HDF5_OnExisting; /* 0 refuse, 1 replace on success */
+extern int FLPQ_HDF5_ChunkY, FLPQ_HDF5_ChunkZ, FLPQ_HDF5_BlockPoints;
+extern int FLPQ_HDF5_LogPerformance;
+
 void out_LPQ2();
 void Set_Grid_Origin_N();
 void Free_Arrays();

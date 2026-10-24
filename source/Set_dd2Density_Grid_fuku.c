@@ -669,10 +669,10 @@ double Set_dd2Density_Grid(double *****CDM)
 	      ai_tmpDGs[itmp1][spin+2][Nc_1] += sum_1;
 	      ai_tmpDGs[itmp1][spin+2][Nc_2] += sum_2;
 	      ai_tmpDGs[itmp1][spin+2][Nc_3] += sum_3;
-	      ai_tmpDGs[itmp2][spin][Nc_0] += sum2_0;
-	      ai_tmpDGs[itmp2][spin][Nc_1] += sum2_1;
-	      ai_tmpDGs[itmp2][spin][Nc_2] += sum2_2;
-	      ai_tmpDGs[itmp2][spin][Nc_3] += sum2_3;
+	      ai_tmpDGs[itmp2][spin+2][Nc_0] += sum2_0;
+	      ai_tmpDGs[itmp2][spin+2][Nc_1] += sum2_1;
+	      ai_tmpDGs[itmp2][spin+2][Nc_2] += sum2_2;
+	      ai_tmpDGs[itmp2][spin+2][Nc_3] += sum2_3;
 	      /*
 	        Tmp_dDen_Grid[k][spin][Mc_AN][Nc_0] += sum_0;
 	        Tmp_dDen_Grid[k][spin][Mc_AN][Nc_1] += sum_1;

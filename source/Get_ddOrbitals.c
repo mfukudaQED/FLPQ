@@ -327,6 +327,18 @@ void Get_ddOrbitals(int wan, double x, double y, double z, double **ddChi)
     }
   }
 
+  /*
+   * Outside the PAO cutoff, the radial functions and all derivatives
+   * vanish.  Do not combine their zeros with uninitialized angular
+   * harmonics: 0 * indeterminate is undefined and affected Hessians.
+   */
+  if (po==1){
+    for (i=0; i<11; ++i){
+      for (j=0; j<Spe_Total_NO[wan]; ++j) ddChi[i][j] = 0.0;
+    }
+    goto orbitals_cleanup;
+  }
+
   /* dr/dx,y,z, dQ/dx,y,z, dP/dx,y,z and dAngular */
   /* x=r*sinQ*cosP, y=r*sinQ*sinP, z=r*cosQ, Q=theta, P=phi */
 
@@ -695,6 +707,8 @@ void Get_ddOrbitals(int wan, double x, double y, double z, double **ddChi)
       }
     }
   }
+
+orbitals_cleanup:
 
   /****************************************************
    freeing of arrays:
